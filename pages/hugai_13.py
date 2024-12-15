@@ -24,13 +24,9 @@ vocabulary = {
     "常用" : ["A", "B", "并","和","，","。","；","、","新","原","将","在","角","墙体","区域","部分"],
     "效果": [
         "打造封闭式", "打造开放式",  "打造非长方形", "实现干湿分离。", "便于后续安装橱柜。", "面积", "增加室内采光", "取消室内采光","改变分区功能。", "打造入户玄关。"
-    ],
-    "后缀" : ["", "A", "B", "C", "D"]
+    ]
 }
-templates={
-    "m1":["房间", "后缀","方位","动作","对象"],
-    "m2":["动作","房间", "后缀","方位","对象"]
-}
+
 num_columns = 8  # 每行显示的按钮数量
 # 函数：更新句子
 def update_sentence(word):
@@ -43,55 +39,21 @@ def clear_sentence():
 # 页面标题
 st.title("户改描述生成器")
 
-tab_c,tab_m=st.tabs(["常用","模板"])
-with tab_c:
-    # 常用卡片
-    column1 = st.columns(num_columns)
-    words = vocabulary["常用"]
-    for k, word in enumerate(words):
-        with column1[k % num_columns]:
-            if st.button(word, key=(f"common_{k}")):
-                update_sentence(word)  # 选中卡片时更新句子
-with tab_m:
-    # 模板1: 在 房间 后缀 方位 动作 对象"
-    m1_columns = st.columns(len(templates["m1"]) + 2)
-    s = "在"
-    with m1_columns[0]:
-        st.write("在")
-    for t, type in enumerate(templates["m1"]):
-        with m1_columns[t+1]:
-            s += st.selectbox(type, options=vocabulary[type], key=f"m1_{type}")
-    with m1_columns[-1]:
-        if st.button("插入", key="m1_bt"):
-            update_sentence(s)
 
-    # 模板2
-    m2_columns = st.columns(len(templates["m2"])+1)
-    s=""
-    for t, type in enumerate(templates["m2"]):
-        with m2_columns[t]:
-            s+=st.selectbox(type, options=vocabulary[type],key=f"m2_{type}")
-    with m2_columns[-1]:
-        if st.button("插入",key="m2_bt"):
-            update_sentence(s)
-    # 模板3
-    m3_colums = st.columns(7)
-    with m3_colums[0]:
-        st.write("将")
-    with m3_colums[1]:
-        room1=st.selectbox("房间",options=vocabulary["房间"],key="m3_1")
-    with m3_colums[2]:
-        suffix1 = st.selectbox("后缀", options=vocabulary["后缀"], key="m3_3")
-    with m3_colums[3]:
-        st.write("合并到")
-    with m3_colums[4]:
-        room2=st.selectbox("房间",vocabulary["房间"],key="m3_2")
-    with m3_colums[5]:
-        suffix2 = st.selectbox("后缀", options=vocabulary["后缀"], key="m3_4")
-    with m3_colums[6]:
-        if st.button("插入", key="m3_5"):
-            s="将{}{}合并到{}{}，增大{}{}面积".format(room1,suffix1,room2,suffix2,room2,suffix2)
-            update_sentence(s)
+# 常用卡片
+column1 = st.columns(num_columns)
+words = vocabulary["常用"]
+for k, word in enumerate(words):
+    with column1[k % num_columns]:
+        if st.button(word, key=(f"common_{k}")):
+            update_sentence(word)  # 选中卡片时更新句子
+# with tab_m:
+# # 模板（开发中）
+# c1,c2,c3,c4,c5,c6=st.columns(6)
+# with c1:
+#     st.write("在")
+# with c1:
+#     st.selectbox()
 
 with st.expander("方位"):
     # 方位卡片
@@ -107,19 +69,19 @@ if "sentence" not in st.session_state:
     st.session_state.sentence = ""
 
 
-with st.expander("全部卡片"):
-    # 创建选项卡
-    tabs = st.tabs(list(vocabulary.keys()))
 
-    # 遍历每个选项卡
-    for i, tab_name in enumerate(vocabulary.keys()):
-        with tabs[i]:
-            words = vocabulary[tab_name]
-            columns = st.columns(num_columns)
-            for j, word in enumerate(words):
-                with columns[j % num_columns]:
-                    if st.button(word,key=(i,j)):
-                        update_sentence(word)  # 选中卡片时更新句子
+# 创建选项卡
+tabs = st.tabs(list(vocabulary.keys()))
+
+# 遍历每个选项卡
+for i, tab_name in enumerate(vocabulary.keys()):
+    with tabs[i]:
+        words = vocabulary[tab_name]
+        columns = st.columns(num_columns)
+        for j, word in enumerate(words):
+            with columns[j % num_columns]:
+                if st.button(word,key=(i,j)):
+                    update_sentence(word)  # 选中卡片时更新句子
 
 # 显示文本框，句子内容会实时更新
 modified_sentence=st.text_area("生成的句子", value=st.session_state.sentence, height=100)
